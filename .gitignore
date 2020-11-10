@@ -1,3 +1,6 @@
+#Carpeta con los datos a utilizar
+datos/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
