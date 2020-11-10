@@ -34,6 +34,7 @@ csv_files = []
 csv_files = list_files(DAT_FILES_FOLDER, '.csv')
 print(csv_files)
 
+# Se lee el archivo csv guardado en la posición 'i'
 df = pd.read_csv(csv_files[2], sep=';', encoding='utf8')
 
 df.head()
