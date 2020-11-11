@@ -19,14 +19,14 @@ def list_files(path, extension):
     """
 
     files = [f for f in os.listdir(path)]
-    #print(files)
+    # print(files)
     archivos = []
 
-    #archivos_dat = [f.append() for f in files if f.endswith('.dat')]
+    # archivos_dat = [f.append() for f in files if f.endswith('.dat')]
     for f in files:
         if f.endswith(extension):
             archivos.append(path+f)
-    #print(archivos_dat)
+    # print(archivos_dat)
 
     return archivos
 
@@ -54,24 +54,24 @@ def dat_files_clean(files):
     for f in files:
         print("\n")
         with open(f, 'r', encoding='ISO-8859-1') as input_file:
-            print("Nombre del archivo: " + f + "\n")
+            # print("Nombre del archivo: " + f + "\n")
             lines = input_file.readlines()
             filtered_file = []
-            #print(lines)
+            # print(lines)
             num_lineas = 0
             for linea in lines:
-                #print(linea)
+                # print(linea)
                 num_lineas += 1
                 linea = linea.split(';')
-                
+
                 if linea[0].startswith('Tipo Transacc'):
-                    #print(linea)
-                    #print(num_lineas)
+                    # print(linea)
+                    # print(num_lineas)
                     break
-            #print(num_lineas)
+            # print(num_lineas)
             filtered_file = lines[num_lineas-1:]
-            #print(filtered_file)
-    
+            # print(filtered_file)
+
     return filtered_file
 
 
@@ -91,9 +91,9 @@ def save_files(output_file_name, content):
 
     # Obtengo solo el nombre de los archivos, sin extensión
     file_names = [os.path.splitext(f)[0] for f in output_file_name]
-    #print(file_name)
+    # print(file_name)
 
-    #print(content)
+    # print(content)
 
     for f in file_names:
         new_files_csv = '{}.{}'.format(f, 'csv')

@@ -6,8 +6,7 @@ Created on Wed Oct 14 10:58:46 2020
 """
 
 import pandas as pd
-from proyecto_crt.lib.file_manager import dat_files_clean, list_files, save_files
-import os
+from proyecto_crt.resources.file_manager import *
 
 # Ruta estática desde donde se leerán los archivos
 DAT_FILES_FOLDER = r'proyecto_crt/datos/'
@@ -24,7 +23,7 @@ print(dat_files_names)
 # que retorna la función list_files()
 dat_files_cleaned = []
 dat_files_cleaned = dat_files_clean(dat_files_names)
-#print(dat_files_cleaned)
+print(dat_files_cleaned)
 
 # Se guardan los archivos .dat filtrados a .csv
 save_files(dat_files_names, dat_files_cleaned)
@@ -35,7 +34,16 @@ csv_files = list_files(DAT_FILES_FOLDER, '.csv')
 print(csv_files)
 
 # Se lee el archivo csv guardado en la posición 'i'
-df = pd.read_csv(csv_files[2], sep=';', encoding='utf8')
+df = pd.read_csv(csv_files[2], sep=';', encoding='latin-1')
+
+
+df = pd.read_csv(csv_files[2], sep=";", names=['Tipo Transacción', 'Fecha Venta', 'Tipo Tarjeta', 'Identificador',
+       'Tipo Venta', 'Código Autorización Venta', 'Nº Cuota',
+       'Monto Transacción', 'Monto Afecto', 'Comisión e IVA Comisión',
+       'Monto Exento', 'Nº Boleta', 'Monto Anulación', 'Monto Retenido',
+       'Devolución Comisión', 'Monto Retención', 'Motivo', 'Período de Cobro',
+       'Detalle de cobros u observación', 'Monto', 'IVA', 'Fecha Abono',
+       'Cuenta de Abono', 'Local'], encoding= "ISO-8859-1").drop([0])
 
 df.head()
 
