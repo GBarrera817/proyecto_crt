@@ -34,7 +34,7 @@ def list_files(path, extension):
 def dat_files_clean(files):
 
     """Limpieza de los archivos '.dat'.
-    Se eliminan las filas que no son de interés para la 
+    Se eliminan las filas que no son de interés para la
     obtención de información.
 
     Parameters
@@ -100,3 +100,26 @@ def save_files(output_file_name, content):
         with open(new_files_csv, 'w') as output_file:
             for linea in content:
                 output_file.write(linea)
+
+
+def get_file_encoding(src_file_path):
+    """
+    Obtiene el tipo de codificación de un archivo
+
+    Parameters
+    ----------
+    src_file_path : str
+        Ruta del archivo
+
+    Returns
+    -------
+
+    : src_file : str
+        Tipo de codificación del archivo
+    """
+
+    with open(src_file_path) as src_file:
+        return src_file.encoding
+
+
+get_file_encoding('proyecto_crt/datos/proceso_crt.txt')
