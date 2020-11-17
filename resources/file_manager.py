@@ -11,24 +11,18 @@ def list_files(path, extension):
     path : str
         la ruta al directorio para buscar
 
+    extension : str
+        la extensión del archivo a buscar
 
     Returns
     -------
-    archivos_dat : list
+    list
         lista con los nombres de los archivos .dat
     """
 
     files = [f for f in os.listdir(path)]
-    # print(files)
-    archivos = []
 
-    # archivos_dat = [f.append() for f in files if f.endswith('.dat')]
-    for f in files:
-        if f.endswith(extension):
-            archivos.append(path+f)
-    # print(archivos_dat)
-
-    return archivos
+    return [path+f for f in files if f.endswith('.' + extension)]
 
 
 def dat_files_clean(files):
@@ -75,6 +69,51 @@ def dat_files_clean(files):
     return filtered_file
 
 
+def bsale_clean_file(path, file):
+
+    #newlines2 = []
+    #i=0
+    with open(path+file, 'r', encoding=get_file_encoding(file)) as input_file:
+        lines = input_file.readlines()
+        newlines = []
+        print(lines)
+        i = 0
+        for linea in lines:
+            # print(linea)
+            i += 1
+            linea = linea.split(';')
+            
+            if linea[0] == 'Tipo Documento' and linea[1] == 'Nº Documento':
+                print(linea)
+                print(i)
+                break
+        print(i)
+        newlines = lines[i-1:]
+    
+    return newlines
+
+"""
+newlines2 = []
+i=0
+with open(archivo2, 'r', encoding='utf8') as input_file2:
+    lines2 = input_file2.readlines()
+    newlines2 = []
+    print(lines2)
+    i=0
+    for linea2 in lines2:
+        #print(linea)
+        i += 1
+        linea2 = linea2.split(';')
+        
+        if linea2[1] == 'Tipo Documento'and linea2[2]=='Nº Documento':
+            print(linea2)
+            print(i)
+            break
+    print(i)
+    newLines2 = lines2[i-1:]
+"""
+
+
 def save_files(output_file_name, content):
 
     """Se guardan los archivos .dat filtrados en archivos .csv
@@ -103,8 +142,7 @@ def save_files(output_file_name, content):
 
 
 def get_file_encoding(src_file_path):
-    """
-    Obtiene el tipo de codificación de un archivo
+    """Obtiene el tipo de codificación de un archivo
 
     Parameters
     ----------
@@ -114,12 +152,9 @@ def get_file_encoding(src_file_path):
     Returns
     -------
 
-    : src_file : str
+    src_file : str
         Tipo de codificación del archivo
     """
 
     with open(src_file_path) as src_file:
         return src_file.encoding
-
-
-get_file_encoding('proyecto_crt/datos/proceso_crt.txt')
