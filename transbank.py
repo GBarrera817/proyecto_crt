@@ -15,22 +15,22 @@ DAT_FILES_FOLDER = r'proyecto_crt/datos/'
 # Se debe pasar como parámetros el directorio donde están los archivos
 # y la extensión de los archivos que se van a buscar
 dat_files_names = []
-dat_files_names = list_files(DAT_FILES_FOLDER, '.dat')
+dat_files_names = fm.list_files(DAT_FILES_FOLDER, '.dat')
 print(dat_files_names)
 
 # Limpieza de los archivos .dat.
 # Se debe pasar como parámetro la lista con los nombres de los archivos .dat
 # que retorna la función list_files()
 dat_files_cleaned = []
-dat_files_cleaned = dat_files_clean(dat_files_names)
+dat_files_cleaned = fm.dat_files_clean(dat_files_names)
 print(dat_files_cleaned)
 
 # Se guardan los archivos .dat filtrados a .csv
-save_files(dat_files_names, dat_files_cleaned)
+fm.save_files(dat_files_names, dat_files_cleaned)
 
 # Lectura de archivo
 csv_files = []
-csv_files = list_files(DAT_FILES_FOLDER, '.csv')
+csv_files = fm.list_files(DAT_FILES_FOLDER, '.csv')
 print(csv_files)
 
 # Se lee el archivo csv guardado en la posición 'i'
