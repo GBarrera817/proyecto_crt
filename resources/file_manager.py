@@ -65,53 +65,44 @@ def dat_files_clean(files):
             # print(num_lineas)
             filtered_file = lines[num_lineas-1:]
             # print(filtered_file)
-
     return filtered_file
 
 
-def bsale_clean_file(path, file):
+def bsale_clean_file(file):
 
-    #newlines2 = []
-    #i=0
-    with open(path+file, 'r', encoding=get_file_encoding(file)) as input_file:
+    """Limpieza de los archivos '.xlsx'.
+    Se eliminan las filas que no son de interés para la
+    obtención de información.
+
+    Parameters
+    ----------
+
+    file : str
+        nombre del archivo .xlsx
+
+    Returns
+    -------
+
+    filtered_file : list
+        lista con el contenido relevante para ser procesado.
+    """
+
+    with open(file, 'r', encoding='utf-8') as input_file:
         lines = input_file.readlines()
         newlines = []
-        print(lines)
+        #print(lines)
         i = 0
         for linea in lines:
             # print(linea)
             i += 1
             linea = linea.split(';')
-            
-            if linea[0] == 'Tipo Documento' and linea[1] == 'Nº Documento':
-                print(linea)
-                print(i)
+            if linea[1] == 'Tipo Documento' and linea[2] == 'Nº Documento':
+                #print(linea)
+                #print(i)
                 break
-        print(i)
+        #print(i)
         newlines = lines[i-1:]
-    
     return newlines
-
-"""
-newlines2 = []
-i=0
-with open(archivo2, 'r', encoding='utf8') as input_file2:
-    lines2 = input_file2.readlines()
-    newlines2 = []
-    print(lines2)
-    i=0
-    for linea2 in lines2:
-        #print(linea)
-        i += 1
-        linea2 = linea2.split(';')
-        
-        if linea2[1] == 'Tipo Documento'and linea2[2]=='Nº Documento':
-            print(linea2)
-            print(i)
-            break
-    print(i)
-    newLines2 = lines2[i-1:]
-"""
 
 
 def save_files(output_file_name, content):
@@ -130,8 +121,7 @@ def save_files(output_file_name, content):
 
     # Obtengo solo el nombre de los archivos, sin extensión
     file_names = [os.path.splitext(f)[0] for f in output_file_name]
-    # print(file_name)
-
+    # print(file_names)
     # print(content)
 
     for f in file_names:
