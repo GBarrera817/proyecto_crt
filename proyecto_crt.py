@@ -2,7 +2,7 @@ import pandas as pd
 import proyecto_crt.resources.file_manager as fm
 
 # Ruta estática desde donde se leerán los archivos
-DAT_FILES_FOLDER = r'proyecto_crt/datos/'
+DAT_FILES_FOLDER = r'proyecto_crt/datos/2020/'
 
 # Obtención de los nombres de los archivos .dat
 # Se debe pasar como parámetros el directorio donde están los archivos
@@ -21,21 +21,28 @@ fm.save_files(dat_files_names, dat_files_cleaned)
 
 # Lectura de archivo
 csv_files = fm.list_files(DAT_FILES_FOLDER, 'csv')
-print(csv_files)
+#print(csv_files)
+
+for csv in csv_files:
+       print(f"[{csv_files.index(csv)}]", csv)
+
 
 # Se lee el archivo csv guardado en la posición 'i'
-df = pd.read_csv(csv_files[0], sep=';', encoding=fm.get_file_encoding(csv_files[0])) 
+
+df_tbdebito_enero = pd.read_csv(csv_files[1], sep=';', encoding=fm.get_file_encoding(csv_files[1]))
+
+df_tbdebito_febrero = pd.read_csv(csv_files[2], sep=';', encoding=fm.get_file_encoding(csv_files[2]))
+
+#df_bsale_enero = pd.read
+
+#df_bsale_febrero = 
 
 
-df = pd.read_csv(csv_files[0], sep=";", names=['Tipo Transacción', 'Fecha Venta', 'Tipo Tarjeta', 'Identificador',
-       'Tipo Venta', 'Código Autorización Venta', 'Nº Cuota',
-       'Monto Transacción', 'Monto Afecto', 'Comisión e IVA Comisión',
-       'Monto Exento', 'Nº Boleta', 'Monto Anulación', 'Monto Retenido',
-       'Devolución Comisión', 'Monto Retención', 'Motivo', 'Período de Cobro',
-       'Detalle de cobros u observación', 'Monto', 'IVA', 'Fecha Abono',
-       'Cuenta de Abono', 'Local'], encoding=fm.get_file_encoding(csv_files[0])).drop([0])
+df_tbdebito_enero.head(10)
+df_tbdebito_enero.info()
 
-df.head()
+df_tbdebito_febrero.head(10)
+df_tbdebito_febrero.info()
 
 
 
