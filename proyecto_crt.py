@@ -73,10 +73,3 @@ df0 = pd.read_csv(archivo2, sep=';', encoding='utf8')
 df1=df0.drop(df0.columns[[0]], axis='columns')
 df1
 
-BE=df1[df1['Tipo Documento'] == 'Boleta Electrónica']
-FO=df1[df1['Tipo Documento'] == 'Factura Electrónica']
-
-new_bsale = DAT_FILES_FOLDER+'B-SALE.xlsx'
-with pd.ExcelWriter(new_bsale) as writer:
-    BE.to_excel(writer, sheet_name='boleta_electronica')
-    FO.to_excel(writer, sheet_name='factura_electronica')
