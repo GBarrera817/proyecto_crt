@@ -25,7 +25,7 @@ def list_files(path, extension):
     return [path+f for f in files if f.endswith('.' + extension)]
 
 
-def dat_files_clean(files):
+def dat_files_clean(files_names):
 
     """Limpieza de los archivos '.dat'.
     Se eliminan las filas que no son de interés para la
@@ -45,26 +45,27 @@ def dat_files_clean(files):
 
     """
 
-    for f in files:
-        print("\n")
-        with open(f, 'r', encoding='ISO-8859-1') as input_file:
+    for f in files_names:
+        #print("\n")
+        with open(f, 'r', encoding='iso-8859-1') as input_file:
             # print("Nombre del archivo: " + f + "\n")
             lines = input_file.readlines()
             filtered_file = []
-            # print(lines)
+            #print(lines)
             num_lineas = 0
             for linea in lines:
-                # print(linea)
+                print(linea)
                 num_lineas += 1
-                linea = linea.split(';')
+                #linea = linea.split(';')
 
-                if linea[0].startswith('Tipo Transacc'):
+                if linea.startswith('Tipo Transacc'):
                     # print(linea)
                     # print(num_lineas)
                     break
             # print(num_lineas)
             filtered_file = lines[num_lineas-1:]
             # print(filtered_file)
+        #save_files(f, filtered_file)
     return filtered_file
 
 
@@ -121,7 +122,7 @@ def save_files(output_file_name, content):
 
     # Obtengo solo el nombre de los archivos, sin extensión
     file_names = [os.path.splitext(f)[0] for f in output_file_name]
-    # print(file_names)
+    print(file_names)
     # print(content)
 
     for f in file_names:
