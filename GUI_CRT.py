@@ -55,7 +55,7 @@ class MiVentana:
     
     def carga_transbank(self):
         
-        file = filedialog.askopenfilename(
+        file = filedialog.askopenfilename(initialdir='datos/2020/',
             filetypes=(("CSV files", "*.csv"),
                        ("All files", "*.*") ))
         
@@ -99,9 +99,9 @@ class MiVentana:
         
     def carga_bsale(self):
         
-        file = filedialog.askopenfilename(
+        file = filedialog.askopenfilename(initialdir='datos/',
             filetypes=(("Excel files", "*.xlsx"),
-                       ("All files", "*.*") ))
+                       ("All files", "*.*")))
         
         file_bsale = file
         self.t2.configure(text=file_bsale)
@@ -189,7 +189,7 @@ class MiVentana:
             'Monto', 'IVA', 'Fecha Abono', 'Cuenta de Abono', 'Local',
             'Unnamed: 24', 'fecha_formateada', 'es_fin_de_mes'])
         
-        print(self.df_transbank.head())
+        #print(self.df_transbank.head())
         
         self.resultado = self.df_transbank
         
@@ -201,7 +201,7 @@ class MiVentana:
         savefile = filedialog.asksaveasfilename(filetypes=(("Excel files", "*.xlsx"),
                                                             ("All files", "*.*")))
         
-        self.resultado.to_excel(savefile, index=False)
+        self.resultado.to_excel(savefile, index=False, engine='openpyxl')
         
         self.t3.configure(text='Procesado con éxito')
 
