@@ -9,12 +9,12 @@ Original file is located at
 
 import pandas as pd 
 import numpy as np
+import os
 
-#from google.colab import drive
-#drive.mount('/content/drive')
 
-DAT_FILES_FOLDER = r'datos/2020/'
-BSALE_PATH = r'datos/'
+CRT_PATH = os.path.dirname(os.path.abspath(__file__))
+DAT_FILES_FOLDER = os.path.join(CRT_PATH, 'datos/2020/')
+BSALE_PATH = os.path.join(CRT_PATH, 'datos/')
 
 #Bsale
 xlsx_bsale = pd.read_excel(BSALE_PATH+'docSearchExport_cc0f2b54bf6e4b085d07fc2bdcdabf5fd73b1843.xlsx', header=11, sheet_name=None)
@@ -25,15 +25,15 @@ xlsx_bsale.keys()
 
 #Obtengo la hoja de nombre específico
 df_bsale = xlsx_bsale.get('docSearchExport_cc0f2b54bf6e4b0')
-df_bsale
+print(df_bsale)
 
 # Obtengo el nombre de las columnas
-df_bsale.columns
+print(df_bsale.columns)
 
 # Separo el archivo bsale con los datos de Boleta y Factura
 df_bsale_bol_fact = df_bsale[(df_bsale['Tipo Documento'] == 'Boleta Electrónica') | (df_bsale['Tipo Documento'] == 'Factura Electrónica')]
 
-df_bsale_bol_fact
+print(df_bsale_bol_fact))
 
 df_transbank = pd.read_csv(DAT_FILES_FOLDER+'03_extraccion-masiva-debito-pesos-1-al-29-02-2020(24-11-2020_20.49.15).csv', delimiter=';')
 df_transbank
