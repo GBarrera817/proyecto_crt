@@ -40,11 +40,11 @@ def main():
 	# El primer archivo .dat
 	dat_files_cleaned = fm.dat_files_clean(dat_files_names[0])
 	print(type(dat_files_cleaned))
-	#print()
-	#print(dat_files_cleaned)
+	print()
+	print(dat_files_cleaned)
 
 	# Se guardan los archivos .dat filtrados a .csv
-	fm.save_files(dat_files_names, dat_files_cleaned)
+	#fm.save_files(dat_files_names, dat_files_cleaned)
 
 	# Lectura de archivo
 	#csv_files = fm.list_files(DAT_FILES_PATH, 'csv')
