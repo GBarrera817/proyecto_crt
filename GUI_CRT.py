@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Dec 18 22:50:40 2020
-
 GUI para CRT
-
-
 @author: Pipe San Martín
 """
 
 # importar la librería
 from tkinter import filedialog
+from threading import Thread
+from tkinter import ttk
 import tkinter as tk
 import pandas as pd
+import os
+
+
 
 class MiVentana:
 	def __init__(self, win):
@@ -27,7 +29,7 @@ class MiVentana:
 		self.btn1 = tk.Button(win, text='Cargar', command=self.carga_transbank)
 		self.btn2 = tk.Button(win, text='Cargar', command=self.carga_bsale)
 		self.btn3 = tk.Button(win, text='Procesar', command=self.procesamiento)
-
+	
 		# Posiciones etiquetas y entradas
 		self.lbl1.place(x=50, y=50)
 		self.t1.place(x=300, y=50)
@@ -39,34 +41,82 @@ class MiVentana:
 		self.lbl3.place(x=50, y=200)
 		self.t3.place(x=200, y=200)
 	
+		
+	def dat_files_clean_worker(self):
+		"""Limpieza de los archivos '.dat'.
+		Se eliminan las filas que no son de interés para la
+		obtención de información.
+
+		Parameters
+		----------
+
+		files : list
+			nombres de los archivos .dat
+
+		Returns
+		-------
+
+		filtered_file : list
+			lista con el contenido relevante para ser procesado.
+
+		"""
+
+		file_name_dat = self.file_transbank
+
+		with open(file_name_dat, 'r', encoding='iso-8859-1') as input_file:
+			lines = input_file.readlines()
+			filtered_file = []
+			num_lineas = 0
+			for linea in lines:
+				#print(linea)
+				num_lineas += 1
+				if linea.startswith('Tipo Transacc'):
+					break
+			filtered_file = lines[num_lineas-1:]
+			
+		head, tail = os.path.split(file_name_dat)
+		tail = tail.replace('.dat', '')
+		#print("Head: " + head, "tail: " + tail)
+
+		new_files_csv = '{}/{}_{}.{}'.format(head, 'eq_beta', tail, 'csv')
+		with open(new_files_csv, 'w') as output_file:
+			for linea in filtered_file:
+				output_file.write(linea)
+		
+		self.csv_file = new_files_csv
+		
+
 	def carga_transbank(self):
 
-		file = filedialog.askopenfilename(initialdir='datos/2020/', filetypes=(("CSV files", "*.csv"), ("All files", "*.*")))
+		file = filedialog.askopenfilename(initialdir='datos/2020/', filetypes=(("dat files", "*.dat"), ("All files", "*.*")))
 
 		# La variable file guardará la ruta del archivo
-		file_transbank = file
+		self.file_transbank = file
+		print(self.file_transbank)
+		
+		self.dat_files_clean_worker()
+		
 		# Aparece en el label la ruta del archivo leído
-		self.t1.configure(text=file_transbank)
-				
-		# Cargar archivo tbank en un dataframe
-		df_transbank = pd.read_csv(file_transbank, delimiter=';')
-		self.df_transbank = df_transbank
-		
+		self.t1.configure(text=self.csv_file)
+			
 	def carga_bsale(self):
-		
 		file = filedialog.askopenfilename(initialdir='datos/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
-		
 		file_bsale = file
 		self.t2.configure(text=file_bsale)
 		
 		# Se filtra el archivo solo por Boleta y Factura
 		self.xlsx_bsale = pd.read_excel(file_bsale, header=11, sheet_name=None, engine='openpyxl')
 		self.df_bsale = self.xlsx_bsale
-		
+
+
 	def procesamiento(self):
 
+		# Cargar archivo tbank en un dataframe
+		self.df_transbank = pd.read_csv(self.csv_file, delimiter=';')
+		#self.df_transbank = self.df_transbank
+
 		#self.resultado = resultado
-		self.t3.configure(text='En proceso... por favor, espere')
+		self.t3.configure(text='En proceso...')
 
 		# Procesamiento archivo tbank
 		self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
