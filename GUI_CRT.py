@@ -10,9 +10,7 @@ GUI para CRT
 
 # importar la librería
 from tkinter import * 
-
 from tkinter.ttk import *
-
 from tkinter import filedialog
 
 import pandas as pd
@@ -64,37 +62,9 @@ class MiVentana:
         # print(file_transbank)
         # # Aparece en el label la ruta del archivo leído
         self.t1.configure(text=file_transbank)
-        
-        # with open(file_transbank, 'r', encoding='iso-8859-1') as input_file:
-        #     lines = input_file.readlines()
-        #     print(lines)
-        #     filtered_file = []
-        #     num_lineas = 0
-        #     for linea in lines:
-        #         #print(linea)
-        #         num_lineas += 1
-        #         if linea.startswith('Tipo Transacc'):
-        #             break
-        #     filtered_file = lines[num_lineas-1:]
-        #print(filtered_file)
-            
-        # Transformación a csv    
-        
-        #head, tail = os.path.split(file_transbank)
-        #print(head)
-        #print(tail)
-        #tail = tail.replace('.dat', '')
-
-        #new_files_csv = '{}/{}_{}.{}'.format(head, '1eq_beta', file_transbank, 'csv')
-        # with open(file_transbank, 'w') as output_file:
-        #     for linea in filtered_file:
-        #         output_file.write(linea)
-        # print(output_file)
                 
         # Procesamiento del archivo tbank
         df_transbank = pd.read_csv(file_transbank, delimiter=';')
-        df_transbank['Nº Boleta'].fillna(" ", inplace=True)
-        
         self.df_transbank = df_transbank
         
     def carga_bsale(self):
@@ -107,20 +77,21 @@ class MiVentana:
         self.t2.configure(text=file_bsale)
         
         # Se filtra el archivo solo por Boleta y Factura
-        xlsx_bsale = pd.read_excel(file_bsale, header=11, sheet_name=None, engine='openpyxl')
-        df_bsale = xlsx_bsale.get('docSearchExport_cc0f2b54bf6e4b0')
-        df_bsale_bol_fact = df_bsale[(df_bsale['Tipo Documento'] == 'Boleta Electrónica') | (df_bsale['Tipo Documento'] == 'Factura Electrónica')]
-        #print(df_bsale_bol_fact)
-        
-        self.df_bsale = df_bsale_bol_fact
+        self.xlsx_bsale = pd.read_excel(file_bsale, header=11, sheet_name=None, engine='openpyxl')
+        self.df_bsale = self.xlsx_bsale
         
         
     def procesamiento(self):
-        
-        #resultado = pd.read_csv(self.file_transbank, encoding='latin-1')
-        # df
+
         #self.resultado = resultado
-        self.t3.configure(text='En proceso')
+        self.t3.configure(text='En proceso... por favor, espere')
+
+        # Procesamiento archivo tbank
+        self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
+
+        # Se filtra el archivo solo por Boleta y Factura
+        self.df_bsale = self.xlsx_bsale.get('docSearchExport_cc0f2b54bf6e4b0')
+        self.df_bsale_bol_fact = self.df_bsale[(self.df_bsale['Tipo Documento'] == 'Boleta Electrónica') | (self.df_bsale['Tipo Documento'] == 'Factura Electrónica')]
         
         # Creacion columna fin_de_mes
         tmp_fecha = []
@@ -139,13 +110,13 @@ class MiVentana:
         trucheo = []
 
         for indice, boleta in zip(self.df_transbank.index, self.df_transbank['Nº Boleta']):
-            if boleta == ' ' or boleta == '0000000000': # Si 'N° boleta es vacío o tiene 0000000000
-                if not self.df_transbank['es_fin_de_mes'][indice]: # Si la fila en la que voy es fin de mes
+            if boleta == ' ' or boleta == 0:  # Si 'N° boleta es vacío o tiene 0
+                if not self.df_transbank['es_fin_de_mes'][indice]:  # Si la fila en la que voy es fin de mes
                     bol = self.df_bsale[self.df_bsale.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
                     if len(bol) == 1:
                         bol = bol['Nº Documento'].item()
                         boletas.append(bol)
-                    #No se encontró  
+                    # No se encontró  
                     elif len(bol) == 0:
                         bol = "Apocalipsis Zombie!!"
                         boletas.append(bol)
@@ -154,7 +125,7 @@ class MiVentana:
                         bol = "REVISAR: Duplicado o +"
                         boletas.append(bol)
                         trucheo.append(indice)
-                else: # 
+                else: 
                     bol = self.df_bsale[self.df_bsale.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
                     if len(bol) == 1:
                         bol = bol['Nº Documento'].item()
@@ -171,23 +142,15 @@ class MiVentana:
             else:
                 boletas.append(boleta)
 
+        # Creo la columna 'boletas_completas' y le asigno los resultados de las boletas que se encontraron
         self.df_transbank['boletas_completas'] = boletas
-        # Renombrar columna
-        self.df_transbank.rename(columns={'boletas_completas':'N° Boleta'}, inplace=True)
-        # Eliminar columna 'Nº Boleta'
-        self.df_transbank.drop(columns=['Nº Boleta'])
-        
-        # Reemplazarla la columna eliminada por 'N° Boleta'
 
-        self.df_transbank = self.df_transbank.reindex(columns=['Tipo Transacción', 'Fecha Venta', 'Tipo Tarjeta', 'Identificador',
-            'Tipo Cuota', 'Monto Original Venta', 'Código Autorización Venta',
-            'Nº Cuota', 'Monto Para Abono', 'Comisión e IVA Comisión',
-            'Comisión Adicional e IVA Comisión Adicional', 'N° Boleta',
-            'Monto Anulación', 'Devolución Comisión e IVA Comisión',
-            'Devolución Comisión Adicional e IVA Comisión', 'Monto Retención',
-            'Período de Cobro', 'Motivo', 'Detalle de cobros u observación',
-            'Monto', 'IVA', 'Fecha Abono', 'Cuenta de Abono', 'Local',
-            'Unnamed: 24', 'fecha_formateada', 'es_fin_de_mes'])
+        # Reemplazo los valores de 'Nº Boleta' por los de 'boletas_completas'
+        self.df_transbank['Nº Boleta'] = self.df_transbank['boletas_completas']
+        # Renombrar columna
+        self.df_transbank.rename(columns={'Nº Boleta':'N° Boleta'}, inplace=True)
+        # Eliminar columna 'boletas_completas'
+        self.df_transbank.drop(columns=['boletas_completas'], inplace=True)
         
         #print(self.df_transbank.head())
         
@@ -205,8 +168,9 @@ class MiVentana:
         
         self.t3.configure(text='Procesado con éxito')
 
-ventana=Tk()
-miwin=MiVentana(ventana)
+
+ventana = Tk()
+miwin = MiVentana(ventana)
 ventana.title('Boletafinder')
-ventana.geometry("800x300+10+10")
+ventana.geometry("1000x300+10+10")
 ventana.mainloop()
