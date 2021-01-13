@@ -13,8 +13,6 @@ import tkinter as tk
 import pandas as pd
 import os
 
-
-
 class MiVentana:
 	def __init__(self, win):
 		# Etiquetas
@@ -68,21 +66,25 @@ class MiVentana:
 			filtered_file = []
 			num_lineas = 0
 			for linea in lines:
-				#print(linea)
+				# print(linea)
 				num_lineas += 1
 				if linea.startswith('Tipo Transacc'):
 					break
 			filtered_file = lines[num_lineas-1:]
 			
 		head, tail = os.path.split(file_name_dat)
-		tail = tail.replace('.dat', '')
-		#print("Head: " + head, "tail: " + tail)
+		file_name = tail.replace('.dat', '')
+		# print("Head: " + head, "tail: " + tail)
 
-		new_files_csv = '{}/{}_{}.{}'.format(head, 'eq_beta', tail, 'csv')
+		# Nuevo nombre de archivo
+		new_files_csv = '{}/{}_{}.{}'.format(head, 'eq_beta', file_name, 'csv')
+
+		# Escritura de los datos de la lista al archivo
 		with open(new_files_csv, 'w') as output_file:
 			for linea in filtered_file:
 				output_file.write(linea)
 		
+		self.tail = tail
 		self.csv_file = new_files_csv
 		
 
@@ -97,12 +99,16 @@ class MiVentana:
 		self.dat_files_clean_worker()
 		
 		# Aparece en el label la ruta del archivo leído
-		self.t1.configure(text=self.csv_file)
+		self.t1.configure(text=self.tail)
 			
 	def carga_bsale(self):
 		file = filedialog.askopenfilename(initialdir='datos/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
 		file_bsale = file
-		self.t2.configure(text=file_bsale)
+
+		# head: ruta del archivo
+		# tail: nombre del archivo + extension
+		head, tail = os.path.split(file_bsale)
+		self.t2.configure(text=tail)
 		
 		# Se filtra el archivo solo por Boleta y Factura
 		self.xlsx_bsale = pd.read_excel(file_bsale, header=11, sheet_name=None, engine='openpyxl')
@@ -211,7 +217,7 @@ def center_window(w=300, h=200):
 root = tk.Tk()
 miwin = MiVentana(root)
 root.title('Boletafinder')
-root.geometry("1000x300+2000+2000")
+root.geometry("1100x300+2000+2000")
 root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='resources/icons/crt.png'))
 #center_window(1000, 300)
 root.mainloop()
