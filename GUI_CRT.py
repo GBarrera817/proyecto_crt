@@ -5,39 +5,56 @@ GUI para CRT
 @author: Pipe San Martín
 """
 
-# importar la librería
+# importar librerías gráficas
+from tkinter import *   # Carga módulo tk (widgets estándar)
 from tkinter import filedialog
-from threading import Thread
-from tkinter import ttk
-import tkinter as tk
-import pandas as pd
+from tkinter import ttk	# Carga ttk (para widgets nuevos 8.5+)
 import os
+import pandas as pd
+from threading import Thread
 
-class MiVentana:
-	def __init__(self, win):
+
+# Crea una clase Python para definir el interfaz de usuario de
+# la aplicación. Cuando se cree un objeto del tipo 'Aplicacion'
+# se ejecutará automáticamente el método __init__() qué 
+# construye y muestra la ventana con todos sus widgets: 
+class Application:
+	def __init__(self):
+
+		# Define la ventana principal de la aplicación
+		self.root = Tk()
+		self.root.title('Boletafinder') # Títutlo de la ventana
+		self.root.geometry("1100x300") # Tamaño de la ventana: anchura x altura
+		self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='resources/icons/crt.png'))
+		#center_window(1000, 300)
+		
 		# Etiquetas
-		self.lbl1 = tk.Label(win, text='Archivo Transbank')
-		self.lbl2 = tk.Label(win, text='Archivo Bsale')
-		self.lbl3 = tk.Label(win, text='Resultado')
-		self.t1 = tk.Label(win, text='Sin archivo')
-		self.t2 = tk.Label(win, text='Sin archivo')
-		self.t3 = tk.Label(win, text='Aun no ha procesado')
+		self.lbl1 = ttk.Label(self.root, text='Archivo Transbank')
+		self.lbl2 = ttk.Label(self.root, text='Archivo Bsale')
+		self.lbl3 = ttk.Label(self.root, text='Resultado')
+		self.statusTbnk = ttk.Label(self.root, text='Sin archivo')
+		self.statusBsale = ttk.Label(self.root, text='Sin archivo')
+		self.status = ttk.Label(self.root, text='Aun no ha procesado')
 
 		# Botones
-		self.btn1 = tk.Button(win, text='Cargar', command=self.carga_transbank)
-		self.btn2 = tk.Button(win, text='Cargar', command=self.carga_bsale)
-		self.btn3 = tk.Button(win, text='Procesar', command=self.procesamiento)
+		self.btn1 = ttk.Button(self.root, text='Cargar', command=self.carga_transbank)
+		self.btn2 = ttk.Button(self.root, text='Cargar', command=self.carga_bsale)
+		self.btn3 = ttk.Button(self.root, text='Procesar', command=self.procesamiento)
+		self.btn3.focus_set()
 	
 		# Posiciones etiquetas y entradas
 		self.lbl1.place(x=50, y=50)
-		self.t1.place(x=300, y=50)
-		self.btn1.place(x=200, y=50)
+		#self.lbl1.pack(side=TOP)
 		self.lbl2.place(x=50, y=100)
-		self.t2.place(x=300, y=100)
-		self.btn2.place(x=200, y=100)
-		self.btn3.place(x=50, y=150)
 		self.lbl3.place(x=50, y=200)
-		self.t3.place(x=200, y=200)
+		self.statusTbnk.place(x=300, y=50)
+		self.statusBsale.place(x=300, y=100)
+		self.status.place(x=200, y=200)
+		self.btn1.place(x=200, y=50)
+		self.btn2.place(x=200, y=100)
+		self.btn3.place(x=500, y=150)
+
+		self.root.mainloop()
 	
 		
 	def dat_files_clean_worker(self):
@@ -99,7 +116,7 @@ class MiVentana:
 		self.dat_files_clean_worker()
 		
 		# Aparece en el label la ruta del archivo leído
-		self.t1.configure(text=self.tail)
+		self.statusTbnk.configure(text=self.tail)
 			
 	def carga_bsale(self):
 		file = filedialog.askopenfilename(initialdir='datos/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
@@ -108,7 +125,7 @@ class MiVentana:
 		# head: ruta del archivo
 		# tail: nombre del archivo + extension
 		head, tail = os.path.split(file_bsale)
-		self.t2.configure(text=tail)
+		self.statusBsale.configure(text=tail)
 		
 		# Se filtra el archivo solo por Boleta y Factura
 		self.xlsx_bsale = pd.read_excel(file_bsale, header=11, sheet_name=None, engine='openpyxl')
@@ -122,7 +139,7 @@ class MiVentana:
 		#self.df_transbank = self.df_transbank
 
 		#self.resultado = resultado
-		self.t3.configure(text='En proceso...')
+		self.status.configure(text='En proceso...')
 
 		# Procesamiento archivo tbank
 		self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
@@ -191,7 +208,7 @@ class MiVentana:
 		
 		self.resultado = self.df_transbank
 		
-		self.btn4 = tk.Button(root, text='Guardar resultado como', command=self.guarda_archivo)        
+		self.btn4 = Button(text='Guardar resultado como', command=self.guarda_archivo)        
 		self.btn4.place(x=350, y=200)
 		
 	def guarda_archivo(self):
@@ -200,8 +217,7 @@ class MiVentana:
 															("All files", "*.*")))
 		
 		self.resultado.to_excel(savefile, index=False, engine='openpyxl')
-		
-		self.t3.configure(text='Procesado con éxito')
+		self.status.configure(text='Procesado con éxito')
 
 
 # Centrar la ventana
@@ -214,10 +230,16 @@ def center_window(w=300, h=200):
     y = (hs/2) - (h/2)
     root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-root = tk.Tk()
-miwin = MiVentana(root)
-root.title('Boletafinder')
-root.geometry("1100x300+2000+2000")
-root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='resources/icons/crt.png'))
-#center_window(1000, 300)
-root.mainloop()
+
+def main():
+    mi_app = Application()
+    return 0
+
+
+# Mediante el atributo __name__ tenemos acceso al nombre de un
+# un módulo. Python utiliza este atributo cuando se ejecuta
+# un programa para conocer si el módulo es ejecutado de forma
+# independiente (en ese caso __name__ = '__main__') o es 
+# importado:
+if __name__ == '__main__':
+    main()
