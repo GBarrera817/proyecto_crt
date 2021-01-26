@@ -137,7 +137,6 @@ class Application:
 		
 
 	def carga_transbank(self):
-		print("carga_transbank")
 		file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/', filetypes=(("dat files", "*.dat"), ("All files", "*.*")))
 
 		# La variable file guardará la ruta del archivo
@@ -153,7 +152,6 @@ class Application:
 
 
 	def carga_bsale(self):
-		print('carga_bsale')
 		file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/',filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
 		file_bsale = file
 
@@ -171,7 +169,6 @@ class Application:
 
 
 	def cargar_tbank_historico(self):
-		print("carga_hist")
 		file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/',filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
 
 		# head: ruta del archivo
@@ -179,9 +176,10 @@ class Application:
 		head, tail = os.path.split(file)
 
 		print(head, tail)
-
+	
 		df_tbank = pd.read_excel(file, sheet_name=None, skiprows=1, engine='openpyxl')
-
+		
+		#print('TIPO: ' + type(df_tbank))
 		# Solo se leerán las hojas que sean de crédito
 		lista_credito_historico = []
 
@@ -282,58 +280,60 @@ class Application:
 			print('Hago el proceso de credito')
 			# Cruce de información Credito con Bsale vs Tbank (csv) vs Tbank Historico
 
-			# boletas = []
-			# trucheo = []
+			boletas = []
+			trucheo = []
 
-			# df_tranbank = self.
+			self.df_tranbank = self.csv_file
+			print(self.df_tranbank)
 
-			# for indice, boleta in zip(df_transbank.index, df_transbank['Nº Boleta']):
-			# 	if boleta == ' ' or boleta == 0: # Si 'N° boleta es vacío
-			# 		if df_transbank['Nº Cuota'][indice] == 'S/C' or df_transbank['Nº Cuota'][indice] == '01/3': #verificar nombre columna
-			# 		if not df_transbank['es_fin_de_mes'][indice]: # Si la fila en la que voy es fin de mes
-			# 			bol = df_bsale_bol_fact[df_bsale_bol_fact.eq(df_transbank['Código Autorización Venta'][indice]).any(1)]
-			# 			if len(bol) == 1:
-			# 			bol = bol['Nº Documento'].item()
-			# 			boletas.append(bol)
-			# 			#No se encontró  
-			# 			elif len(bol) == 0:
-			# 			bol = "Apocalipsis Zombie!!"
-			# 			boletas.append(bol)
-			# 			# Hay duplicados
-			# 			else:
-			# 			bol = "REVISAR: Duplicado o +"
-			# 			boletas.append(bol)
-			# 			trucheo.append(indice)
-			# 		else: # 
-			# 			bol = df_bsale_bol_fact[df_bsale_bol_fact.eq(df_transbank['Código Autorización Venta'][indice]).any(1)]
-			# 			if len(bol) == 1:
-			# 				bol = bol['Nº Documento'].item()
-			# 				boletas.append(bol)
-			# 			#No se encontró  
-			# 			elif len(bol) == 0:
-			# 				bol = "Revisar: fin de mes"
-			# 				boletas.append(bol)
-			# 			# Hay duplicados
-			# 			else:
-			# 				bol = "Duplicado o +"
-			# 				boletas.append(bol)
-			# 				trucheo.append(indice)
-			# 		else:
-			# 		bol = df_credito_historico[df_credito_historico.eq(df_transbank['Código Autorización Venta'][indice]).any(1)]
-			# 		if len(bol) == 1:
-			# 			bol = bol['Nº Documento'].item()
-			# 			boletas.append(bol)
-			# 		#No se encontró  
-			# 		elif len(bol) == 0:
-			# 			bol = "Apocalipsis Zombie!!" # -> 'cambiar mensaje'
-			# 			boletas.append(bol)
-			# 		# Hay duplicados
-			# 		else:
-			# 			bol = "REVISAR: Duplicado o +" # -> 'cambiar mensaje'
-			# 			boletas.append(bol)
-			# 			trucheo.append(indice)
-			# 	else:
-			# 		boletas.append(boleta)
+			for indice, boleta in zip(self.df_tranbank.index, self.df_tranbank['Nº Boleta']):
+				if boleta == ' ' or boleta == 0: # Si 'N° boleta es vacío
+					# Si N° Cuota es 'S/C' o '1/3'
+					if self.df_tranbank['Nº Cuota'][indice] == 'S/C' or self.df_tranbank['Nº Cuota'][indice] == '01/3': #verificar nombre columna
+						if not self.df_tranbank['es_fin_de_mes'][indice]: # Si la fila en la que voy es fin de mes
+							bol = self.df_bsale_bol_fact[self.df_bsale_bol_fact.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
+							if len(bol) == 1:
+								bol = bol['Nº Documento'].item()
+								boletas.append(bol)
+							#No se encontró  
+							elif len(bol) == 0:
+								bol = "Apocalipsis Zombie!!"
+								boletas.append(bol)
+							# Hay duplicados
+							else:
+								bol = "REVISAR: Duplicado o +"
+								boletas.append(bol)
+								trucheo.append(indice)
+						else: # 
+							bol = self.df_bsale_bol_fact[self.df_bsale_bol_fact.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
+							if len(bol) == 1:
+								bol = bol['Nº Documento'].item()
+								boletas.append(bol)
+							#No se encontró  
+							elif len(bol) == 0:
+								bol = "Revisar: fin de mes"
+								boletas.append(bol)
+							# Hay duplicados
+							else:
+								bol = "Duplicado o +"
+								boletas.append(bol)
+								trucheo.append(indice)
+					else:
+						bol = self.df_credito_historico[self.df_credito_historico.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
+						if len(bol) == 1:
+							bol = bol['Nº Documento'].item()
+							boletas.append(bol)
+						#No se encontró  
+						elif len(bol) == 0:
+							bol = "Apocalipsis Zombie!!" # -> 'cambiar mensaje'
+							boletas.append(bol)
+						# Hay duplicados
+						else:
+							bol = "REVISAR: Duplicado o +" # -> 'cambiar mensaje'
+							boletas.append(bol)
+							trucheo.append(indice)
+				else:
+					boletas.append(boleta)
 			self.status.configure(text='Todo listo')
 		
 		self.btn_guardar = ttk.Button(self.frame, text='Guardar resultado como', command=self.guarda_archivo)        
