@@ -11,7 +11,8 @@ from tkinter import filedialog
 from tkinter import ttk	# Carga ttk (para widgets nuevos 8.5+)
 import os
 import pandas as pd
-from threading import Thread
+import numpy as np
+import openpyxl
 
 
 # Crea una clase Python para definir el interfaz de usuario de
@@ -197,12 +198,13 @@ class Application:
         # head: ruta del archivo
         # tail: nombre del archivo + extension
         head, tail = os.path.split(file)
-
         print(head, tail)
+
+        wb_obj = openpyxl.load_workbook(file)
     
-        df_tbank_hist = pd.read_excel(file, sheet_name=None, skiprows=1, engine='openpyxl')
+        df_tbank_hist = pd.read_excel(wb_obj, sheet_name=None, skiprows=1, engine='openpyxl')
         print(df_tbank_hist)
-        
+
         #print('TIPO: ' + type(df_tbank))
         # Solo se leerán las hojas que sean de crédito
         lista_credito_historico = []
@@ -221,6 +223,16 @@ class Application:
         # Se unen todos los sheets de credito en un dataframe
         df_credito_historico = pd.concat(lista_credito_historico)
         df_credito_historico = df_credito_historico.reset_index(drop=True)
+
+        conditions = [(df_credito_historico['Nº Cuota'] == '2020-03-03 00:00:00') | (df_credito_historico['Nº Cuota'] == '03/03') | (df_credito_historico['Nº Cuota'] == '2021-03-03 00:00:00'),
+             (df_credito_historico['Nº Cuota'] == '2020-03-02 00:00:00') | (df_credito_historico['Nº Cuota'] == '02/03')| (df_credito_historico['Nº Cuota'] == '2021-03-02 00:00:00'),
+             (df_credito_historico['Nº Cuota'] == '2020-03-01 00:00:00') | (df_credito_historico['Nº Cuota'] == '01/03')| (df_credito_historico['Nº Cuota'] == '2021-03-01 00:00:00'),
+             (df_credito_historico['Nº Cuota'] == 'S/C')]
+        choices = ['03/03', '02/03', '01/03', 'S/C']
+
+        df_credito_historico['Cuota_formateada'] = np.select(conditions, choices, default=df_credito_historico['Nº Cuota'])
+        df_credito_historico['Nº Cuota'] = df_credito_historico['Cuota_formateada']
+        df_credito_historico = df_credito_historico.drop(columns=['Cuota_formateada'])
 
         self.statusTbnkHist.configure(text=tail)
         self.df_credito_historico = df_credito_historico
