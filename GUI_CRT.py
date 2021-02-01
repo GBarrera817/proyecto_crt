@@ -19,6 +19,8 @@ import openpyxl
 # la aplicación. Cuando se cree un objeto del tipo 'Aplicacion'
 # se ejecutará automáticamente el método __init__() qué 
 # construye y muestra la ventana con todos sus widgets: 
+
+
 class Application:
     def __init__(self):
 
@@ -26,7 +28,7 @@ class Application:
         self.root = Tk()
         self.root.title('Boletafinder') # Títutlo de la ventana
         self.root.geometry("1100x300") # Tamaño de la ventana: anchura x altura
-        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='resources/icons/crt.png'))
+        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='resources\\icons\\crt.png'))
         #center_window(1000, 300)
         
         self.frame = ttk.Frame(self.root, borderwidth=5,
@@ -43,7 +45,7 @@ class Application:
         self.status = ttk.Label(self.frame, text='Aun no ha procesado', padding=(5, 5))
 
         # Radiobuttons
-        self.seleccionado = IntVar() # Guarda la opcion que se marque en los radio button
+        self.seleccionado = IntVar()  # Guarda la opcion que se marque en los radio button
         self.radio_debito = ttk.Radiobutton(self.frame, text='Proceso débito', value=1, variable=self.seleccionado, command=self.clickeado)
         self.radio_credito = ttk.Radiobutton(self.frame, text='Proceso crédito', value=2, variable=self.seleccionado, command=self.clickeado)
         self.radio_debito.focus_set()
@@ -198,12 +200,12 @@ class Application:
         # head: ruta del archivo
         # tail: nombre del archivo + extension
         head, tail = os.path.split(file)
-        print(head, tail)
+        #print(head, tail)
 
         wb_obj = openpyxl.load_workbook(file)
     
         df_tbank_hist = pd.read_excel(wb_obj, sheet_name=None, skiprows=1, engine='openpyxl')
-        print(df_tbank_hist)
+        #print(df_tbank_hist)
 
         #print('TIPO: ' + type(df_tbank))
         # Solo se leerán las hojas que sean de crédito
@@ -242,8 +244,7 @@ class Application:
         
         self.status.configure(text='En proceso...')
 
-        if self.seleccionado.get() == 1:
-            print('Hago el proceso de debito')
+        if self.seleccionado.get() == 1:  # Si se selecciona el radiobutton de debito
 
             # self.resultado = resultado
 
@@ -275,7 +276,7 @@ class Application:
             for indice, boleta in zip(self.df_transbank_ok.index, self.df_transbank_ok['Nº Boleta']):
                 if boleta == ' ' or boleta == 0:  # Si 'N° boleta es vacío o tiene 0
                     if not self.df_transbank_ok['es_fin_de_mes'][indice]:  # Si la fila en la que voy es fin de mes
-                        bol = self.df_bsale[self.df_bsale.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
+                        bol = self.df_bsale_bol_fact[self.df_bsale_bol_fact.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
                         if len(bol) == 1:
                             bol = bol['Nº Documento'].item()
                             boletas.append(bol)
@@ -289,7 +290,7 @@ class Application:
                             boletas.append(bol)
                             trucheo.append(indice)
                     else: 
-                        bol = self.df_bsale[self.df_bsale.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
+                        bol = self.df_bsale_bol_fact[self.df_bsale_bol_fact.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
                         if len(bol) == 1:
                             bol = bol['Nº Documento'].item()
                             boletas.append(bol)
@@ -316,18 +317,13 @@ class Application:
             
             self.resultado = self.df_transbank_ok
             self.status.configure(text='Todo listo')
-        else:
-            print('Hago el proceso de credito')
-
+        else: # Si se selecciona el radiobutton de credito
             boletas = []
             trucheo = []
 
-            #self.df_transbank = pd.read_csv(self.csv_file, delimiter=';')
-            #print(self.df_tranbank)
-
             for indice, boleta in zip(self.df_transbank_ok.index, self.df_transbank_ok['Nº Boleta']):
                 if boleta == ' ' or boleta == 0: # Si 'N° boleta es vacío
-                    # Si N° Cuota es 'S/C' o '1/3'
+                    # Si N° Cuota es 'S/C' o '1/3' : Busca los datos en el archivo Bsale
                     if self.df_transbank_ok['Nº Cuota'][indice] == 'S/C' or self.df_transbank_ok['Nº Cuota'][indice] == '01/3': #verificar nombre columna
                         if not self.df_transbank_ok['es_fin_de_mes'][indice]: # Si la fila en la que voy es fin de mes
                             bol = self.df_bsale_bol_fact[self.df_bsale_bol_fact.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
@@ -357,10 +353,11 @@ class Application:
                                 bol = "Duplicado o +"
                                 boletas.append(bol)
                                 trucheo.append(indice)
+                    # Busca los datos en el archivo histórico
                     else:
                         bol = self.df_credito_historico[self.df_credito_historico.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
                         if len(bol) == 1:
-                            bol = bol['Nº Documento'].item()
+                            bol = bol['Código Autorización Venta'].item()
                             boletas.append(bol)
                         #No se encontró  
                         elif len(bol) == 0:
@@ -373,6 +370,17 @@ class Application:
                             trucheo.append(indice)
                 else:
                     boletas.append(boleta)
+
+            # Creo la columna 'boletas_completas' y le asigno los resultados de las boletas que se encontraron
+            self.df_transbank_ok['boletas_completas'] = boletas
+            # Reemplazo los valores de 'Nº Boleta' por los de 'boletas_completas'
+            self.df_transbank_ok['Nº Boleta'] = self.df_transbank['boletas_completas']
+            # Renombrar columna
+            self.df_transbank_ok.rename(columns={'Nº Boleta':'N° Boleta'}, inplace=True)
+            # Eliminar columna 'boletas_completas'
+            self.df_transbank_ok.drop(columns=['boletas_completas'], inplace=True)
+            
+            self.resultado = self.df_transbank_ok
             self.status.configure(text='Todo listo')
         
         self.btn_guardar = ttk.Button(self.frame, text='Guardar resultado como', command=self.guarda_archivo)        
@@ -399,30 +407,3 @@ def main():
 # importado:
 if __name__ == '__main__':
     main()
-
-
-
-# # Historico de Tranbank 2020
-# df_tbank = pd.read_excel('/content/drive/MyDrive/proyecto_crt/datos/Transbank 2020 CRT.xlsx', sheet_name=None, skiprows=1)
-
-# # Solo se leerán las hojas que sean de crédito
-# lista_credito_historico = []
-
-# for df in df_tbank:
-#   # Busca solo los sheet de Credito
-#   if 'credito' in df.lower() or 'crédito' in df.lower():  
-#     #print(type(df), df, df_tbank[df])
-#     print(df)
-#     columnas = df_tbank[df].loc[26].tolist()
-#     # Se establece las nuevas columnas que se encuentran en la fila 26
-#     df_tbank[df].columns = columnas
-#     # Agregamos los datos de credito al diccionario
-#     lista_credito_historico.append(df_tbank[df].loc[26:, ['Fecha Venta', 'Código Autorización Venta', 'Nº Cuota', 'Nº Boleta']])
-
-# # Se unen todos los sheets de credito en un dataframe
-# df_credito_historico = pd.concat(lista_credito_historico)
-
-# df_credito_historico = df_credito_historico.reset_index(drop=True)
-
-# df_credito_historico['Nº Cuota'].value_counts()
-
