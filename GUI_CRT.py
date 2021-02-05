@@ -32,7 +32,7 @@ class Application:
         #center_window(1000, 300)
         
         self.frame = ttk.Frame(self.root, borderwidth=5,
-                               relief='solid', padding=(10, 10), height=1100, width=300) # relief = (flat, groove, raised, ridge, solid, or sunken)
+                               relief='flat', height=1100, width=300) # relief = (flat, groove, raised, ridge, solid, or sunken)
 
         # Etiquetas
         self.lbl_tbank = ttk.Label(self.frame, text='Archivo Transbank', padding=(5, 5))
@@ -84,10 +84,13 @@ class Application:
     
     def clickeado(self):
         if self.seleccionado.get() == 1:
+            
             self.btn_cargar_historico.configure(state='disabled')
         else:
             self.btn_cargar_historico.configure(state='enable')
-
+        self.statusTbnk.configure(text='Sin archivo')
+        self.statusBsale.configure(text='Sin archivo')
+        self.statusTbnkHist.configure(text='Sin archivo')
         self.btn_cargar_tbank.configure(state='normal')
         self.btn_cargar_bsale.configure(state='normal')
         self.btn_procesar.configure(state='normal')
@@ -175,7 +178,7 @@ class Application:
         self.df_transbank['es_fin_de_mes'] = self.df_transbank['fecha_formateada'].dt.is_month_end
 
         self.df_transbank_ok = self.df_transbank
-        print('Cargado -> {}'.format(self.df_transbank_ok))
+        print('Cargado -> {}'.format(file))
 
     def carga_bsale(self):
         file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/',filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
@@ -196,7 +199,7 @@ class Application:
         # print(keys)
         self.df_bsale = self.xlsx_bsale.get(keys[0])
         self.df_bsale_bol_fact = self.df_bsale[(self.df_bsale['Tipo Documento'] == 'Boleta Electrónica') | (self.df_bsale['Tipo Documento'] == 'Factura Electrónica')]
-        print('Cargado -> {}'.format(self.df_bsale_bol_fact))
+        print('Cargado -> {}'.format(file))
 
     def cargar_tbank_historico(self):
         file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
