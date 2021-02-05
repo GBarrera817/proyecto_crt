@@ -28,7 +28,7 @@ class Application:
         self.root = Tk()
         self.root.title('Boletafinder') # Títutlo de la ventana
         self.root.geometry("1100x300") # Tamaño de la ventana: anchura x altura
-        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='resources\\icons\\crt.png'))
+        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='resources/icons/crt.png'))
         #center_window(1000, 300)
         
         self.frame = ttk.Frame(self.root, borderwidth=5,
@@ -51,10 +51,10 @@ class Application:
         self.radio_debito.focus_set()
 
         # Botones
-        self.btn_cargar_tbank = ttk.Button(self.frame, text='Cargar', command=self.carga_transbank)
-        self.btn_cargar_bsale = ttk.Button(self.frame, text='Cargar', command=self.carga_bsale)
-        self.btn_cargar_historico = ttk.Button(self.frame, text='Cargar histórico', command=self.cargar_tbank_historico)
-        self.btn_procesar = ttk.Button(self.frame, text='Procesar', command=self.procesamiento)
+        self.btn_cargar_tbank = ttk.Button(self.frame, text='Cargar', command=self.carga_transbank, state='disabled')
+        self.btn_cargar_bsale = ttk.Button(self.frame, text='Cargar', command=self.carga_bsale, state='disabled')
+        self.btn_cargar_historico = ttk.Button(self.frame, text='Cargar histórico', command=self.cargar_tbank_historico, state='disabled')
+        self.btn_procesar = ttk.Button(self.frame, text='Procesar', command=self.procesamiento, state='disabled')
         self.btn_cargar_tbank.focus_set()
 
         # Posiciones etiquetas y entradas
@@ -82,15 +82,16 @@ class Application:
 
         self.root.mainloop()
     
-
     def clickeado(self):
         if self.seleccionado.get() == 1:
-             
             self.btn_cargar_historico.configure(state='disabled')
         else:
             self.btn_cargar_historico.configure(state='enable')
-        
 
+        self.btn_cargar_tbank.configure(state='normal')
+        self.btn_cargar_bsale.configure(state='normal')
+        self.btn_procesar.configure(state='normal')
+        
     def dat_files_clean_worker(self):
         """Limpieza de los archivos '.dat'.
         Se eliminan las filas que no son de interés para la
@@ -112,7 +113,7 @@ class Application:
 
         file_name_dat = self.file_transbank
 
-        print('DAT FILE: ' + file_name_dat)
+        # print('DAT FILE: ' + file_name_dat)
 
         with open(file_name_dat, 'r', encoding='ISO-8859-1') as input_file:
             lines = input_file.readlines()
@@ -142,7 +143,6 @@ class Application:
         self.file_name = file_name
         self.csv_file = new_files_csv
         
-
     def carga_transbank(self):
         file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/', filetypes=(("dat files", "*.dat"), ("All files", "*.*")))
 
@@ -158,7 +158,7 @@ class Application:
         self.statusTbnk.configure(text=self.file_name+'.csv')
 
         # Cargar archivo tbank en un dataframe
-        self.df_transbank = pd.read_csv(self.csv_file, delimiter=';', encoding='ISO-8859-1')
+        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='ISO-8859-1')
 
         # Procesamiento archivo tbank
         self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
@@ -175,7 +175,7 @@ class Application:
         self.df_transbank['es_fin_de_mes'] = self.df_transbank['fecha_formateada'].dt.is_month_end
 
         self.df_transbank_ok = self.df_transbank
-
+        print('Cargado -> {}'.format(self.df_transbank_ok))
 
     def carga_bsale(self):
         file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/',filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
@@ -190,9 +190,13 @@ class Application:
 
         self.df_bsale = self.xlsx_bsale
         # Se filtra el archivo solo por Boleta y Factura
-        self.df_bsale = self.xlsx_bsale.get('docSearchExport_cc0f2b54bf6e4b0') # HAY QUE LEER LA HOJA DINAMICAMENTE
+        # print(type(self.df_bsale.keys()))
+        # print(dir(self.df_bsale.keys()))
+        keys = list(self.df_bsale.keys())
+        # print(keys)
+        self.df_bsale = self.xlsx_bsale.get(keys[0])
         self.df_bsale_bol_fact = self.df_bsale[(self.df_bsale['Tipo Documento'] == 'Boleta Electrónica') | (self.df_bsale['Tipo Documento'] == 'Factura Electrónica')]
-
+        print('Cargado -> {}'.format(self.df_bsale_bol_fact))
 
     def cargar_tbank_historico(self):
         file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
@@ -238,36 +242,14 @@ class Application:
 
         self.statusTbnkHist.configure(text=tail)
         self.df_credito_historico = df_credito_historico
-        
 
+        print('Cargado -> {}'.format(self.df_df_credito_historicosale_bol_fact))
+        
     def procesamiento(self):
         
         self.status.configure(text='En proceso...')
 
         if self.seleccionado.get() == 1:  # Si se selecciona el radiobutton de debito
-
-            # self.resultado = resultado
-
-            # # Cargar archivo tbank en un dataframe
-            # self.df_transbank = pd.read_csv(self.csv_file, delimiter=';')
-
-            # # self.resultado = resultado
-            # self.status.configure(text='En proceso...')
-
-            # # Procesamiento archivo tbank
-            # self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
-
-            # # Creacion columna fin_de_mes
-            # tmp_fecha = []
-            # for fecha in self.df_transbank['Fecha Venta']:
-            # 	fecha_nueva = fecha[:10]
-            # 	tmp_fecha.append(fecha_nueva)
-            # self.df_transbank['fecha_formateada'] = tmp_fecha
-            # # Convertir "Fecha Venta" a datetime
-            # self.df_transbank['fecha_formateada'] = pd.to_datetime(self.df_transbank['fecha_formateada'], format='%d/%m/%Y')
-            # # Creamos una columna para saber si 'Fecha Venta' es fin de mes
-            # self.df_transbank['es_fin_de_mes'] = self.df_transbank['fecha_formateada'].dt.is_month_end
-            # self.df_transbank['es_fin_de_mes'][0]
             
             # Cruce de información
             boletas = []
@@ -322,7 +304,7 @@ class Application:
             trucheo = []
 
             for indice, boleta in zip(self.df_transbank_ok.index, self.df_transbank_ok['Nº Boleta']):
-                if boleta == ' ' or boleta == 0: # Si 'N° boleta es vacío
+                if boleta == ' ' or boleta == 0 or boleta == '0000000000': # Si 'N° boleta es vacío
                     # Si N° Cuota es 'S/C' o '1/3' : Busca los datos en el archivo Bsale
                     if self.df_transbank_ok['Nº Cuota'][indice] == 'S/C' or self.df_transbank_ok['Nº Cuota'][indice] == '01/3': #verificar nombre columna
                         if not self.df_transbank_ok['es_fin_de_mes'][indice]: # Si la fila en la que voy es fin de mes
@@ -355,19 +337,20 @@ class Application:
                                 trucheo.append(indice)
                     # Busca los datos en el archivo histórico
                     else:
-                        bol = self.df_credito_historico[self.df_credito_historico.eq(self.df_transbank['Código Autorización Venta'][indice]).any(1)]
+                        bol = self.df_credito_historico[self.df_credito_historico.eq(self.df_transbank_ok['Código Autorización Venta'][indice]).any(1)]
                         if len(bol) == 1:
-                            bol = bol['Código Autorización Venta'].item()
+                            #bol = bol['Código Autorización Venta'].item()
+                            #print(type(bol))        
+                            #print(bol['Nº Boleta'].tolist()[0])
+                            bol = bol['Nº Boleta'].item()
+                            boletas.append(bol)
+                        elif len(bol) > 1:
+                            bol = bol['Nº Boleta'].tolist()[0]
                             boletas.append(bol)
                         #No se encontró  
-                        elif len(bol) == 0:
+                        else: #len(bol) == 0:
                             bol = "Apocalipsis Zombie!!" # -> 'cambiar mensaje'
                             boletas.append(bol)
-                        # Hay duplicados
-                        else:
-                            bol = "REVISAR: Duplicado o +" # -> 'cambiar mensaje'
-                            boletas.append(bol)
-                            trucheo.append(indice)
                 else:
                     boletas.append(boleta)
 
