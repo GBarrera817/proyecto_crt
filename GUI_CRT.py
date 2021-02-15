@@ -161,7 +161,7 @@ class Application:
         self.statusTbnk.configure(text=self.file_name+'.csv')
 
         # Cargar archivo tbank en un dataframe
-        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='ISO-8859-1')
+        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='utf-8')
 
         # Procesamiento archivo tbank
         self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
@@ -222,7 +222,7 @@ class Application:
             # Busca solo los sheet de Credito
             if 'credito' in df.lower() or 'crédito' in df.lower():
                 # print(type(df), df, df_tbank[df])
-                print(df)
+                # print(df)
                 columnas = df_tbank_hist[df].loc[26].tolist()
                 # Se establece las nuevas columnas que se encuentran en la fila 26
                 df_tbank_hist[df].columns = columnas
@@ -246,7 +246,7 @@ class Application:
         self.statusTbnkHist.configure(text=tail)
         self.df_credito_historico = df_credito_historico
 
-        print('Cargado -> {}'.format(self.df_df_credito_historicosale_bol_fact))
+        print('Cargado -> {}'.format(file))
         
     def procesamiento(self):
         
