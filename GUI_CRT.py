@@ -147,7 +147,7 @@ class Application:
         self.csv_file = new_files_csv
         
     def carga_transbank(self):
-        file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/', filetypes=(("dat files", "*.dat"), ("All files", "*.*")))
+        file = filedialog.askopenfilename(initialdir='/Users/monicazanelli/Desktop/', filetypes=(("dat files", "*.dat"), ("All files", "*.*")))
 
         # La variable file guardará la ruta del archivo
         self.file_transbank = file
@@ -181,7 +181,7 @@ class Application:
         print('Cargado -> {}'.format(file))
 
     def carga_bsale(self):
-        file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/2020/',filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
+        file = filedialog.askopenfilename(initialdir='/Users/monicazanelli/Desktop/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
         file_bsale = file
 
         # head: ruta del archivo
@@ -202,7 +202,7 @@ class Application:
         print('Cargado -> {}'.format(file))
 
     def cargar_tbank_historico(self):
-        file = filedialog.askopenfilename(initialdir='/media/Datos/Documentos/archivos_proyecto_crt/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
+        file = filedialog.askopenfilename(initialdir='/Users/monicazanelli/Desktop/', filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*")))
 
         # head: ruta del archivo
         # tail: nombre del archivo + extension
@@ -210,9 +210,11 @@ class Application:
         #print(head, tail)
 
         wb_obj = openpyxl.load_workbook(file)
-    
+        print(wb_obj)
+
+        ## REVISAR!!!!
         df_tbank_hist = pd.read_excel(wb_obj, sheet_name=None, skiprows=1, engine='openpyxl')
-        #print(df_tbank_hist)
+        print(df_tbank_hist)
 
         #print('TIPO: ' + type(df_tbank))
         # Solo se leerán las hojas que sean de crédito
@@ -224,6 +226,8 @@ class Application:
                 # print(type(df), df, df_tbank[df])
                 # print(df)
                 columnas = df_tbank_hist[df].loc[26].tolist()
+                #columnas = df_tbank_hist[df]
+                #print(columnas)
                 # Se establece las nuevas columnas que se encuentran en la fila 26
                 df_tbank_hist[df].columns = columnas
                 # Agregamos los datos de credito al diccionario
