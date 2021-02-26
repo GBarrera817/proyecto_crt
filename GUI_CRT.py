@@ -42,7 +42,7 @@ class Application:
         self.statusTbnk = ttk.Label(self.frame, text='Sin archivo', padding=(5, 5))
         self.statusBsale = ttk.Label(self.frame, text='Sin archivo', padding=(5, 5))
         self.statusTbnkHist = ttk.Label(self.frame, text='Sin archivo', padding=(5, 5))
-        self.status = ttk.Label(self.frame, text='Aun no ha procesado', padding=(5, 5))
+        self.status = ttk.Label(self.frame, text='Aún no ha procesado', padding=(5, 5))
 
         # Radiobuttons
         self.seleccionado = IntVar()  # Guarda la opcion que se marque en los radio button
@@ -161,7 +161,8 @@ class Application:
         self.statusTbnk.configure(text=self.file_name+'.csv')
 
         # Cargar archivo tbank en un dataframe
-        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='utf-8')
+        #self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='utf-8')
+        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='ISO-8859-1')
 
         # Procesamiento archivo tbank
         self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
@@ -210,11 +211,11 @@ class Application:
         #print(head, tail)
 
         wb_obj = openpyxl.load_workbook(file)
-        print(wb_obj)
+        #print(wb_obj)
 
         ## REVISAR!!!!
         df_tbank_hist = pd.read_excel(wb_obj, sheet_name=None, skiprows=1, engine='openpyxl')
-        print(df_tbank_hist)
+        #print(df_tbank_hist)
 
         #print('TIPO: ' + type(df_tbank))
         # Solo se leerán las hojas que sean de crédito
@@ -378,10 +379,13 @@ class Application:
         
     def guarda_archivo(self):
         
-        savefile = filedialog.asksaveasfilename(defaultextension='.xlsx', filetypes=(("Excel files", "*.xlsx"),
+        savefile = filedialog.asksaveasfilename(defaultextension='.csv', filetypes=(("CSV Files", "*.csv"), ("Excel files", "*.xlsx"),
                                                             ("All files", "*.*")))
         
-        self.resultado.to_excel(savefile, index=False, engine='openpyxl')
+        #writer = pd.ExcelWriter(savefile, engine="xlsxwriter")
+        #self.resultado.to_excel(writer, index=False, encoding='utf-8')
+        #writer.save()
+        self.resultado.to_csv(savefile, sep=";", encoding='utf-8', index=False)
         self.status.configure(text='Procesado con éxito')
 
 
