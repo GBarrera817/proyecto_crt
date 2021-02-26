@@ -161,8 +161,8 @@ class Application:
         self.statusTbnk.configure(text=self.file_name+'.csv')
 
         # Cargar archivo tbank en un dataframe
-        #self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='utf-8')
-        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='ISO-8859-1')
+        self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='utf-8')
+        #self.df_transbank = pd.read_csv(self.csv_file, sep=';', encoding='ISO-8859-1')
 
         # Procesamiento archivo tbank
         self.df_transbank['Nº Boleta'].fillna(" ", inplace=True)
@@ -379,13 +379,13 @@ class Application:
         
     def guarda_archivo(self):
         
-        savefile = filedialog.asksaveasfilename(defaultextension='.csv', filetypes=(("CSV Files", "*.csv"), ("Excel files", "*.xlsx"),
-                                                            ("All files", "*.*")))
+        savefile = filedialog.asksaveasfilename(defaultextension='.xlsx', filetypes=(("Excel files", "*.xlsx"),
+                                                            ("All files", "*.*"))) #("CSV Files", "*.csv"), 
         
-        #writer = pd.ExcelWriter(savefile, engine="xlsxwriter")
-        #self.resultado.to_excel(writer, index=False, encoding='utf-8')
-        #writer.save()
-        self.resultado.to_csv(savefile, sep=";", encoding='utf-8', index=False)
+        writer = pd.ExcelWriter(savefile, engine="xlsxwriter")
+        self.resultado.to_excel(writer, index=False, encoding='utf-8')
+        writer.save()
+        #self.resultado.to_csv(savefile, sep=";", encoding='utf-8', index=False)
         self.status.configure(text='Procesado con éxito')
 
 
